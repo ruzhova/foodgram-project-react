@@ -46,7 +46,7 @@ jobs:
         with:
           push: true
           context: ./backend/
-          tags: ruzhova/foodgram:latest
+          tags: ruzhova/backend:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,8 +60,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            sudo docker pull ruzhova/backend
-            sudo docker pull ruzhova/frontend
+            sudo docker pull ruzhova/backend:v1
+            sudo docker pull ruzhova/frontend:v1
             sudo docker-compose stop
             sudo docker-compose rm backend
             sudo docker-compose rm frontend
