@@ -9,7 +9,7 @@ services:
     restart: always
 
   backend:
-    image: ruzhova/backend
+    image: ruzhova/backend:v1
     volumes:
       - static_value:/backend/static/
       - media_value:/backend/media/
@@ -20,7 +20,7 @@ services:
     restart: always
 
   frontend:
-    image: ruzhova/frontend
+    image: ruzhova/frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
