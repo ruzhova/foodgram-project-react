@@ -14,11 +14,11 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-SECRET_KEY = 'django-insecure-py4glcqopv^tc7q=xt6p&pk(15x7l++l=ek&hw8x_1g1w!=6)e'
+SECRET_KEY = os.getenv('SECRET_KEY', 'unsafe-secret-key')
 
 DEBUG = True
 
-ALLOWED_HOSTS = [ '*' ]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1').split(' ')
 
 
 INSTALLED_APPS = [
