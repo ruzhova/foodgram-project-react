@@ -28,7 +28,7 @@ class SubscribeView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def post(self, request, id):
+    def get(self, request, id):
         data = {
             'user': request.user.id,
             'author': id
@@ -58,11 +58,15 @@ class ShowSubscriptionsView(ListAPIView):
     """ Отображение подписок. """
     
     permission_classes = [IsAuthenticated, ]
-    pagination_class = CustomPagination
     serializer_class = ShowSubscriptionsSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
     def get_queryset(self):
-        return Subscription.objects.filter(user=self.request.user.id)
+        return User.objects.filter(author__user=self.request.user)
 
 
 class FavoriteView(APIView):
@@ -71,7 +75,7 @@ class FavoriteView(APIView):
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
 
-    def post(self, request, id):
+    def get(self, request, id):
         data = {
             'user': request.user.id,
             'recipe': id
@@ -91,21 +95,9 @@ class FavoriteView(APIView):
         recipe = get_object_or_404(Recipe, id=id)
         if Favorite.objects.filter(
            user=request.user, recipe=recipe).exists():
-            favorite = get_object_or_404(
-                Favorite, user=request.user, recipe=recipe
-            )
-            favorite.delete()
+            Favorite.objects.filter(user=request.user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class ShowFavoriteView(ListAPIView):
-    permission_classes = [IsAuthenticated, ]
-    pagination_class = CustomPagination
-    serializer_class = ShowFavoriteSerializer
-
-    def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user.id)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -153,7 +145,7 @@ class ShoppongCartView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def post(self, request, id):
+    def get(self, request, id):
         data = {
             'user': request.user.id,
             'recipe': id
