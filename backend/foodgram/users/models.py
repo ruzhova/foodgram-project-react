@@ -21,16 +21,6 @@ class User(AbstractUser):
     class Meta:
         ordering = ['-pk']
 
-    # @property
-    # def is_admin(self):
-    #     return self.is_staff or self.is_superuser
-
-    # def has_perm(self, perm, obj=None):
-    #     return self.is_staff
-
-    # def has_module_perms(self, app_label):
-    #     return True
-
 
 class Subscription(models.Model):
     """ Модель подписок. """

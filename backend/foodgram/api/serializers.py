@@ -84,8 +84,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField(
+        method_name='get_is_favorited')
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name='get_is_in_shopping_cart')
 
     class Meta:
         model = Recipe
@@ -111,7 +113,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request is None or request.user.is_anonymous:
             return False
         return Favorite.objects.filter(
-            user=request.user, recipe=obj
+            user=request.user, recipe_id=obj
         ).exists()
 
     def get_is_in_shopping_cart(self, obj):
@@ -119,7 +121,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request is None or request.user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
-            user=request.user, recipe=obj
+            user=request.user, recipe_id=obj
         ).exists()
 
 
@@ -135,6 +137,8 @@ class AddIngredientRecipeSerializer(serializers.ModelSerializer):
 
 
 class CreateRecipeSerializer(serializers.ModelSerializer):
+    """ Сериализатор создания/обновления рецепта. """
+
     author = CustomUserSerializer(read_only=True)
     ingredients = AddIngredientRecipeSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(

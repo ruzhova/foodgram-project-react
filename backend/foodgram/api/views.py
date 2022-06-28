@@ -127,7 +127,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     queryset = Recipe.objects.all()
     filter_backends = [DjangoFilterBackend, ]
-    filter_class = RecipeFilter
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -140,7 +140,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return context
 
 
-class ShoppongCartView(APIView):
+class ShoppingCartView(APIView):
     """ Добавление рецепта в корзину или его удаление. """
 
     permission_classes = [IsAuthenticated, ]
