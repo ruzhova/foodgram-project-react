@@ -1,10 +1,10 @@
-from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,8 +18,9 @@ from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, ShowSubscriptionsSerializer,
-                          SubscriptionSerializer, TagSerializer)
+                          ShoppingCartSerializer, ShowFavoriteSerializer,
+                          ShowSubscriptionsSerializer, SubscriptionSerializer,
+                          TagSerializer)
 
 
 class SubscribeView(APIView):
@@ -53,17 +54,15 @@ class SubscribeView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class ShowSubscriptionsView(APIView):
+class ShowSubscriptionsView(ListAPIView):
     """ Отображение подписок. """
-
+    
     permission_classes = [IsAuthenticated, ]
+    pagination_class = CustomPagination
+    serializer_class = ShowSubscriptionsSerializer
 
-    def get(self, request):
-        queryset = User.objects.filter(author__user=request.user)
-        serializer = ShowSubscriptionsSerializer(
-            queryset, context={'request': request}, many=True
-        )
-        return Response(serializer.data)
+    def get_queryset(self):
+        return Subscription.objects.filter(user=self.request.user.id)
 
 
 class FavoriteView(APIView):
@@ -98,6 +97,15 @@ class FavoriteView(APIView):
             favorite.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ShowFavoriteView(ListAPIView):
+    permission_classes = [IsAuthenticated, ]
+    pagination_class = CustomPagination
+    serializer_class = ShowFavoriteSerializer
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user.id)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
