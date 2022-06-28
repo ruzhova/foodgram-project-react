@@ -10,8 +10,8 @@ services:
   backend:
     image: ruzhova/backend:v1
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - ../static/:/app/static/
+      - ../media/:/app/media/recipes/
     depends_on:
       - db
     env_file:
