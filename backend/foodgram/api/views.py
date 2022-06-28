@@ -28,7 +28,7 @@ class SubscribeView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request, id):
+    def post(self, request, id):
         data = {
             'user': request.user.id,
             'author': id
@@ -58,15 +58,16 @@ class ShowSubscriptionsView(ListAPIView):
     """ Отображение подписок. """
     
     permission_classes = [IsAuthenticated, ]
-    serializer_class = ShowSubscriptionsSerializer
+    pagination_class = CustomPagination
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({'request': self.request})
-        return context
-
-    def get_queryset(self):
-        return User.objects.filter(author__user=self.request.user)
+    def get(self, request):
+        user = request.user
+        queryset = User.objects.filter(following__user=user)
+        page = self.paginate_queryset(queryset)
+        serializer = ShowSubscriptionsSerializer(
+            page, many=True, context={'request': request}
+        )
+        return self.get_paginated_response(serializer.data)
 
 
 class FavoriteView(APIView):
@@ -75,7 +76,7 @@ class FavoriteView(APIView):
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
 
-    def get(self, request, id):
+    def post(self, request, id):
         data = {
             'user': request.user.id,
             'recipe': id
@@ -145,13 +146,14 @@ class ShoppingCartView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request, id):
+    def post(self, request, id):
         data = {
             'user': request.user.id,
             'recipe': id
         }
+        recipe = get_object_or_404(Recipe, id=id)
         if not ShoppingCart.objects.filter(
-           user=request.user, recipe__id=id).exists():
+           user=request.user, recipe=recipe).exists():
             serializer = ShoppingCartSerializer(
                 data=data, context={'request': request}
             )

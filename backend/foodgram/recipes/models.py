@@ -50,6 +50,7 @@ class Recipe(models.Model):
         Tag,
         through='RecipeTag',
         verbose_name='Теги',
+        related_name='tags'
     )
     author = models.ForeignKey(
         User,

@@ -1,4 +1,5 @@
-from django_filters import rest_framework as filters
+from django_filters import rest_framework as filter
+from rest_framework import filters
 from rest_framework.filters import SearchFilter
 
 from recipes.models import Recipe, Tag
@@ -9,11 +10,15 @@ class IngredientFilter(SearchFilter):
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.AllValuesMultipleFilter(
-        field_name='recipetag__tag__slug',
+    author = filter.CharFilter()
+    tags = filter.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        queryset=Tag.objects.all(),
+        label='Tags',
+        to_field_name='slug'
     )
-    is_favorited = filters.BooleanFilter(method='get_favorite')
-    is_in_shopping_cart = filters.BooleanFilter(
+    is_favorited = filter.BooleanFilter(method='get_favorite')
+    is_in_shopping_cart = filter.BooleanFilter(
         method='get_is_in_shopping_cart')
 
     class Meta:
