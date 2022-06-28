@@ -6,13 +6,12 @@ services:
       - /var/lib/postgresql/data/
     env_file:
       - ./.env
-    restart: always
 
   backend:
     image: ruzhova/backend:v1
     volumes:
-      - static_value:/backend/static/
-      - media_value:/backend/media/
+      - static_value:/app/static/
+      - media_value:/app/media/
     depends_on:
       - db
     env_file:
@@ -31,17 +30,17 @@ services:
     ports:
       - "80:80"
     volumes:
-      - static_value:/static/
-      - media_value:/media/recipes/
+      - ../static/:/var/html/static/
+      - ../media/:/var/html/media/recipes/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
     depends_on:
       - backend
       - frontend
     restart: always
 
 volumes:
+  postgres_data:
   static_value:
   media_value:
