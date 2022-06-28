@@ -5,10 +5,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            RecipeTag, ShoppingCart, Tag)
-from users.models import Subscription
-
-User = get_user_model()
+                            ShoppingCart, Tag)
+from users.models import Subscription, User
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -166,7 +164,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
     def create_tags(self, tags, recipe):
         for tag in tags:
-            RecipeTag.objects.create(tag=tag, recipe=recipe)
+            recipe.tags.add(tag)
 
     def create(self, validated_data):
         """
@@ -188,7 +186,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         Доступно только автору.
         """
 
-        RecipeTag.objects.filter(recipe=instance).delete()
+        instance.tags.clear()
         RecipeIngredient.objects.filter(recipe=instance).delete()
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -286,9 +284,6 @@ class ShowSubscriptionsSerializer(serializers.ModelSerializer):
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     """ Сериализатор подписок. """
-    queryset = User.objects.all()
-    user = serializers.PrimaryKeyRelatedField(queryset=queryset)
-    author = serializers.PrimaryKeyRelatedField(queryset=queryset)
 
     class Meta:
         model = Subscription

@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
-from users.models import User
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -10,14 +11,20 @@ class Ingredient(models.Model):
 
     name = models.CharField(
         'Название ингредиента',
-        unique=True,
         max_length=200
     )
     measurement_unit = models.CharField('Единицы измерения', max_length=200)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='ingredient_name_unit_unique'
+            )
+        ]
 
 
 class Tag(models.Model):
@@ -28,6 +35,7 @@ class Tag(models.Model):
     slug = models.SlugField('Slug', unique=True, max_length=200)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -40,21 +48,18 @@ class Recipe(models.Model):
 
     tags = models.ManyToManyField(
         Tag,
-        through='RecipeTag',
         verbose_name='Теги',
-        related_name='tags'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='Автор рецепта',
+        verbose_name='Автор рецепта'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
-        verbose_name='Ингридиенты',
-        related_name='ingredients'
+        verbose_name='Ингридиенты'
     )
     image = models.ImageField(
         'Изображение',
@@ -109,28 +114,28 @@ class RecipeIngredient(models.Model):
             )
         ]
 
+# если не понадобится - уберу окончательно
+# class RecipeTag(models.Model):
+#     """ Модель связи тега и рецепта. """
 
-class RecipeTag(models.Model):
-    """ Модель связи тега и рецепта. """
+#     recipe = models.ForeignKey(
+#         Recipe,
+#         on_delete=models.CASCADE,
+#         verbose_name='Рецепт'
+#     )
+#     tag = models.ForeignKey(
+#         Tag,
+#         on_delete=models.CASCADE,
+#         verbose_name='Тег'
+#     )
 
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        verbose_name='Рецепт'
-    )
-    tag = models.ForeignKey(
-        Tag,
-        on_delete=models.CASCADE,
-        verbose_name='Тег'
-    )
-
-    class Meta:
-        constraints = [
-            UniqueConstraint(
-                fields=['recipe', 'tag'],
-                name='recipe_tag_unique'
-            )
-        ]
+#     class Meta:
+#         constraints = [
+#             UniqueConstraint(
+#                 fields=['recipe', 'tag'],
+#                 name='recipe_tag_unique'
+#             )
+#         ]
 
 
 class ShoppingCart(models.Model):

@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -27,10 +28,9 @@ class SubscribeView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request, id):
-        author = get_object_or_404(User, id=id)
         data = {
             'user': request.user.id,
-            'author': author.id
+            'author': id
         }
         serializer = SubscriptionSerializer(
             data=data,
@@ -60,11 +60,11 @@ class ShowSubscriptionsView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request):
-        queryset = User.objects.filter(following__user=request.user)
+        queryset = User.objects.filter(author__user=request.user)
         serializer = ShowSubscriptionsSerializer(
             queryset, context={'request': request}, many=True
         )
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
 
 class FavoriteView(APIView):
@@ -105,6 +105,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """ Отображение тегов. """
 
     permission_classes = [AllowAny, ]
+    pagination_class = None
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
 
@@ -113,6 +114,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """ Отображение ингредиентов. """
 
     permission_classes = [AllowAny, ]
+    pagination_class = None
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     filter_backends = [IngredientFilter, ]

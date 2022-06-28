@@ -8,22 +8,28 @@ from .validators import validate_username
 class User(AbstractUser):
     """ Кастомная модель пользователя. """
 
-    email = models.EmailField('email', max_length=254, unique=True)
-    first_name = models.CharField('first_name', max_length=150, blank=False)
-    last_name = models.CharField('last_name', max_length=150, blank=False)
+    email = models.EmailField('Почта', max_length=254, unique=True)
+    first_name = models.CharField('Имя', max_length=150, blank=False)
+    last_name = models.CharField('Фамилия', max_length=150, blank=False)
     username = models.CharField(
-        'username',
+        'Юзернейм',
         max_length=150,
         validators=[validate_username])
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
-        ordering = ('-pk', )
+        ordering = ['-pk']
 
-    @property
-    def is_admin(self):
-        return self.is_staff or self.is_superuser
+    # @property
+    # def is_admin(self):
+    #     return self.is_staff or self.is_superuser
+
+    # def has_perm(self, perm, obj=None):
+    #     return self.is_staff
+
+    # def has_module_perms(self, app_label):
+    #     return True
 
 
 class Subscription(models.Model):
@@ -37,7 +43,7 @@ class Subscription(models.Model):
     )
     author = models.ForeignKey(
         User,
-        related_name='following',
+        related_name='author',
         on_delete=models.CASCADE,
         verbose_name='Автор'
     )
