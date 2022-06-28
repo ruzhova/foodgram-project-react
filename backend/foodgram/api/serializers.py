@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
+                            RecipeTag, ShoppingCart, Tag)
 from users.models import Subscription, User
 
 
@@ -164,7 +164,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
     def create_tags(self, tags, recipe):
         for tag in tags:
-            recipe.tags.add(tag)
+            RecipeTag.objects.create(recipe=recipe, tag=tag)
 
     def create(self, validated_data):
         """
@@ -186,7 +186,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         Доступно только автору.
         """
 
-        instance.tags.clear()
+        RecipeTag.objects.filter(recipe=instance).delete()
         RecipeIngredient.objects.filter(recipe=instance).delete()
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')

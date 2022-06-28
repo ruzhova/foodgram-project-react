@@ -57,7 +57,6 @@ class ShowSubscriptionsView(APIView):
     """ Отображение подписок. """
 
     permission_classes = [IsAuthenticated, ]
-    pagination_class = CustomPagination
 
     def get(self, request):
         queryset = User.objects.filter(author__user=request.user)
