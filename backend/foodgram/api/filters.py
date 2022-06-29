@@ -9,7 +9,7 @@ class IngredientFilter(SearchFilter):
     search_param = 'name'
 
 
-class RecipeFilter(filters.FilterSet):
+class RecipeFilter(filter.FilterSet):
     author = filter.CharFilter()
     tags = filter.ModelMultipleChoiceFilter(
         field_name='tags__slug',

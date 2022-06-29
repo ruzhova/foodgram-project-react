@@ -21,6 +21,9 @@ class User(AbstractUser):
     class Meta:
         ordering = ['-pk']
 
+    def __str__(self):
+        return self.username
+
 
 class Subscription(models.Model):
     """ Модель подписок. """

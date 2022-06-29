@@ -62,7 +62,7 @@ class ShowSubscriptionsView(ListAPIView):
 
     def get(self, request):
         user = request.user
-        queryset = User.objects.filter(following__user=user)
+        queryset = User.objects.filter(author__user=user)
         page = self.paginate_queryset(queryset)
         serializer = ShowSubscriptionsSerializer(
             page, many=True, context={'request': request}
