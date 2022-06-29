@@ -161,6 +161,10 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
     def create_ingredients(self, ingredients, recipe):
         for i in ingredients:
             ingredient = Ingredient.objects.get(id=i['id'])
+            amount = i['amount']
+            if int(amount) < 1:
+                raise serializers.ValidationError(
+                    'Количество ингредиента быть больше 0!')
             RecipeIngredient.objects.create(
                 ingredient=ingredient, recipe=recipe, amount=i['amount']
             )
