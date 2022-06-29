@@ -55,3 +55,5 @@ sudo docker-compose exec backend python manage.py loadmodels --path 'recipes/dat
 email: blondie@gmail.com
 password: deblondharry
 ```
+
+![example workflow](https://github.com/ruzhova/foodgram-project-react/actions/workflows/main.yml/badge.svg)
