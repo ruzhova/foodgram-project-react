@@ -165,7 +165,7 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             amount = i['amount']
             if int(amount) < 1:
                 raise serializers.ValidationError({
-                   'amount': 'Количество ингредиента быть больше 0!'
+                   'amount': 'Количество ингредиента должно быть больше 0!'
                 })
             if i['id'] in list:
                 raise serializers.ValidationError({
@@ -173,8 +173,8 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
                 })
             list.append(i['id'])
 
-        time = self.initial_data.get('cooking_time')
-        if int(time) <= 0:
+        cooking_time = self.initial_data.get('cooking_time')
+        if int(cooking_time) < 1:
             raise serializers.ValidationError({
                 'cooking_time': 'Время готовки должно быть не менее 1 минуты!'
             })
@@ -222,9 +222,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         if validated_data.get('image'):
             instance.image = validated_data.pop('image')
         instance.cooking_time = validated_data.pop('cooking_time')
-        if int(instance.cooking_time) < 1:
-            raise serializers.ValidationError(
-                'Время готовки должно быть не менее 1 минуты!')
         instance.save()
         return instance
 

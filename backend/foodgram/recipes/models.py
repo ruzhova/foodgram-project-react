@@ -61,7 +61,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
-        verbose_name='Ингридиенты'
+        verbose_name='Ингредиенты'
     )
     image = models.ImageField(
         'Изображение',
@@ -73,8 +73,10 @@ class Recipe(models.Model):
         help_text='Введите описание рецепта'
     )
     cooking_time = models.PositiveIntegerField(
-        'Время приготовления',
-        validators=[MinValueValidator(1)]
+        verbose_name='Время приготовления',
+        validators=[MinValueValidator(
+            1, message='Время готовки должно быть не менее 1 минуты!'
+        )]
     )
     pub_date = models.DateTimeField(
         'Время публикации',
