@@ -116,6 +116,7 @@ class RecipeIngredient(models.Model):
             )
         ]
 
+
 class RecipeTag(models.Model):
     """ Модель связи тега и рецепта. """
 

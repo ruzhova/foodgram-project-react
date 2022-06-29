@@ -18,9 +18,8 @@ from .pagination import CustomPagination
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (CreateRecipeSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeSerializer,
-                          ShoppingCartSerializer, ShowFavoriteSerializer,
-                          ShowSubscriptionsSerializer, SubscriptionSerializer,
-                          TagSerializer)
+                          ShoppingCartSerializer, ShowSubscriptionsSerializer,
+                          SubscriptionSerializer, TagSerializer)
 
 
 class SubscribeView(APIView):
@@ -56,7 +55,7 @@ class SubscribeView(APIView):
 
 class ShowSubscriptionsView(ListAPIView):
     """ Отображение подписок. """
-    
+
     permission_classes = [IsAuthenticated, ]
     pagination_class = CustomPagination
 
