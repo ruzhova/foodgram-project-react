@@ -181,6 +181,10 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
+        time = validated_data.pop('cooking_time')
+        if int(time) < 1:
+            raise serializers.ValidationError(
+                'Время готовки должно быть не менее 1 минуты!')
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)
         self.create_ingredients(ingredients, recipe)
@@ -204,6 +208,9 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
         if validated_data.get('image'):
             instance.image = validated_data.pop('image')
         instance.cooking_time = validated_data.pop('cooking_time')
+        if int(instance.cooking_time) < 1:
+            raise serializers.ValidationError(
+                'Время готовки должно быть не менее 1 минуты!')
         instance.save()
         return instance
 
