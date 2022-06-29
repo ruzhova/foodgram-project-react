@@ -158,13 +158,31 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
             'cooking_time'
         ]
 
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        list = []
+        for i in ingredients:
+            amount = i['amount']
+            if int(amount) < 1:
+                raise serializers.ValidationError({
+                   'amount': 'Количество ингредиента быть больше 0!'
+                })
+            if i['id'] in list:
+                raise serializers.ValidationError({
+                   'ingredient': 'Ингредиенты должны быть уникальными!'
+                })
+            list.append(i['id'])
+
+        time = self.initial_data.get('cooking_time')
+        if int(time) <= 0:
+            raise serializers.ValidationError({
+                'cooking_time': 'Время готовки должно быть не менее 1 минуты!'
+            })
+        return data
+
     def create_ingredients(self, ingredients, recipe):
         for i in ingredients:
             ingredient = Ingredient.objects.get(id=i['id'])
-            amount = i['amount']
-            if int(amount) < 1:
-                raise serializers.ValidationError(
-                    'Количество ингредиента быть больше 0!')
             RecipeIngredient.objects.create(
                 ingredient=ingredient, recipe=recipe, amount=i['amount']
             )
@@ -181,10 +199,6 @@ class CreateRecipeSerializer(serializers.ModelSerializer):
 
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        time = validated_data.pop('cooking_time')
-        if int(time) < 1:
-            raise serializers.ValidationError(
-                'Время готовки должно быть не менее 1 минуты!')
         author = self.context.get('request').user
         recipe = Recipe.objects.create(author=author, **validated_data)
         self.create_ingredients(ingredients, recipe)
